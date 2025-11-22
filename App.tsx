@@ -6,17 +6,15 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 
 
 
-import { auth } from './src/services/firebaseConfig'; // CORRETO
+import { auth } from './src/services/firebaseConfig';
 import LoginUsuario from './screens/LoginUsuario';
 import CadastrarUsuario from './screens/CadastrarUsuario';
-
-// Crie um componente de Home simples para demonstração
-const HomeScreen = () => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Bem-vindo! Você está logado.</Text>
-    <Text>ID do Usuário: {auth.currentUser?.uid}</Text>
-  </View>
-);
+import Home from './screens/Home';
+import Cursos from './screens/Cursos';
+import Vagas from './screens/Vagas';
+import Empresas from './screens/Empresas';
+import Certificados from './screens/Certificados';
+import Perfil from './screens/Perfil';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +24,36 @@ const Stack = createNativeStackNavigator();
 function AppStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Tela Principal' }} />
+      <Stack.Screen 
+        name="Home" 
+        component={Home} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Cursos" 
+        component={Cursos} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Vagas" 
+        component={Vagas} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Empresas" 
+        component={Empresas} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Certificados" 
+        component={Certificados} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="Perfil" 
+        component={Perfil} 
+        options={{ headerShown: false }} 
+      />
     </Stack.Navigator>
   );
 }
