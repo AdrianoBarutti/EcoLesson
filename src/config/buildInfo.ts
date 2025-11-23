@@ -5,6 +5,6 @@
 export const buildInfo = {
   appName: 'EcoLesson',
   version: '1.0.0',
-  commitHash: 'ed4d9ae6b80e433099f830ff227521d5d736119e',
+  commitHash: '6d06aec742700af1fb1ab6fd978e1b8cf647e244',
   buildDate: '2025-11-23',
 };

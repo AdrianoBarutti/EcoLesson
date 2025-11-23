@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,38 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { buildInfo } from "../src/config/buildInfo";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { buildInfo as initialBuildInfo } from "../src/config/buildInfo";
 
 export default function SobreApp() {
   const navigation = useNavigation();
+  const [info, setInfo] = useState(initialBuildInfo);
+
+  // Recarrega automaticamente quando a tela recebe foco
+  useFocusEffect(
+    React.useCallback(() => {
+      // Remove o cache do módulo e recarrega
+      try {
+        delete require.cache[require.resolve('../src/config/buildInfo')];
+        const freshInfo = require('../src/config/buildInfo').buildInfo;
+        setInfo(freshInfo);
+      } catch (e) {
+        // Se houver erro, mantém os valores iniciais
+        setInfo(initialBuildInfo);
+      }
+    }, [])
+  );
+
+  // Também recarrega quando o componente monta
+  useEffect(() => {
+    try {
+      delete require.cache[require.resolve('../src/config/buildInfo')];
+      const freshInfo = require('../src/config/buildInfo').buildInfo;
+      setInfo(freshInfo);
+    } catch (e) {
+      setInfo(initialBuildInfo);
+    }
+  }, []);
 
   const formatCommitHash = (hash: string) => {
     if (!hash || hash.length < 7) return hash || 'N/A';
@@ -35,29 +62,29 @@ export default function SobreApp() {
           <View style={styles.logoCircle}>
             <Text style={styles.logoText}>EL</Text>
           </View>
-          <Text style={styles.appName}>{buildInfo.appName}</Text>
+          <Text style={styles.appName}>{info.appName}</Text>
         </View>
 
         <View style={styles.infoSection}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Versão</Text>
-            <Text style={styles.infoValue}>{buildInfo.version}</Text>
+            <Text style={styles.infoValue}>{info.version}</Text>
           </View>
 
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Hash do Commit</Text>
             <View style={styles.commitContainer}>
-              <Text style={styles.commitHash}>{formatCommitHash(buildInfo.commitHash)}</Text>
+              <Text style={styles.commitHash}>{formatCommitHash(info.commitHash)}</Text>
             </View>
             <Text style={styles.commitFull}>
-              {buildInfo.commitHash}
+              {info.commitHash}
             </Text>
           </View>
 
           <View style={[styles.infoItem, styles.lastInfoItem]}>
             <Text style={styles.infoLabel}>Data do Build</Text>
             <Text style={styles.infoValue}>
-              {new Date(buildInfo.buildDate).toLocaleDateString('pt-BR')}
+              {new Date(info.buildDate).toLocaleDateString('pt-BR')}
             </Text>
           </View>
         </View>
