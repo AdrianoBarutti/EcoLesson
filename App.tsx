@@ -15,6 +15,7 @@ import Vagas from './screens/Vagas';
 import Empresas from './screens/Empresas';
 import Certificados from './screens/Certificados';
 import Perfil from './screens/Perfil';
+import SobreApp from './screens/SobreApp';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,11 @@ function AppStack() {
       <Stack.Screen 
         name="Perfil" 
         component={Perfil} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="SobreApp" 
+        component={SobreApp} 
         options={{ headerShown: false }} 
       />
     </Stack.Navigator>

@@ -176,6 +176,14 @@ export default function Perfil() {
           )}
 
           <TouchableOpacity
+            style={[styles.btn, styles.btnSobre]}
+            onPress={() => navigation.navigate('SobreApp' as never)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.btnText}>Sobre o App</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.btn, styles.btnLogout, isLoggingOut && styles.btnDisabled]}
             onPress={async () => {
               if (isLoggingOut) {
@@ -366,6 +374,14 @@ const styles = StyleSheet.create({
   },
   btnCancelar: {
     backgroundColor: "#6c757d",
+  },
+  btnSobre: {
+    backgroundColor: "#4A90E2",
+    shadowColor: "#4A90E2",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   btnLogout: {
     backgroundColor: "#E74C3C",
