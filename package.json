@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
+    "prestart": "node scripts/update-build-info.js",
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "android": "node scripts/update-build-info.js && expo start --android",
+    "ios": "node scripts/update-build-info.js && expo start --ios",
+    "web": "node scripts/update-build-info.js && expo start --web",
+    "update-build-info": "node scripts/update-build-info.js"
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.19",
