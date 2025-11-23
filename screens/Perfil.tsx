@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,15 +7,30 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { signOut, updateProfile } from "firebase/auth";
+import { useNavigation, CommonActions } from "@react-navigation/native";
+import { signOut, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../src/services/firebaseConfig";
 
 export default function Perfil() {
   const navigation = useNavigation();
   const [editando, setEditando] = useState(false);
   const [nome, setNome] = useState(auth.currentUser?.displayName || "");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Monitora mudanças no estado de autenticação
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user && isLoggingOut) {
+        // Usuário foi deslogado, não precisa fazer nada
+        // o App.tsx já vai redirecionar automaticamente
+        setIsLoggingOut(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isLoggingOut]);
 
   const handleSalvar = async () => {
     if (!auth.currentUser) return;
@@ -30,10 +45,56 @@ export default function Perfil() {
   };
 
   const handleLogout = async () => {
+    console.log("=== handleLogout CHAMADO ===");
+    
     try {
+      setIsLoggingOut(true);
+      console.log("Estado isLoggingOut definido como true");
+      
+      if (!auth.currentUser) {
+        console.log("❌ Nenhum usuário logado");
+        Alert.alert("Aviso", "Nenhum usuário logado.");
+        setIsLoggingOut(false);
+        return;
+      }
+      
+      const userEmail = auth.currentUser.email;
+      const userUID = auth.currentUser.uid;
+      console.log("✅ Usuário encontrado:", userEmail);
+      console.log("✅ UID:", userUID);
+      
+      console.log("Chamando signOut(auth)...");
       await signOut(auth);
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível fazer logout");
+      console.log("✅ signOut(auth) concluído sem erros");
+      
+      // Verifica imediatamente
+      console.log("Verificando auth.currentUser após signOut:", auth.currentUser);
+      
+      // Aguarda um pouco para o Firebase processar
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const checkAfterDelay = auth.currentUser;
+      console.log("Verificação após 500ms:", checkAfterDelay);
+      
+      if (checkAfterDelay) {
+        console.error("❌ PROBLEMA: Usuário ainda está logado após signOut!");
+        setIsLoggingOut(false);
+        Alert.alert("Erro", "Não foi possível fazer logout. Por favor, feche e reabra o aplicativo.");
+      } else {
+        console.log("✅ SUCESSO: Usuário é null após signOut");
+        // O onAuthStateChanged no App.tsx deve redirecionar automaticamente
+      }
+      
+    } catch (error: any) {
+      console.error("❌ ERRO CAPTURADO no handleLogout:");
+      console.error("Tipo do erro:", typeof error);
+      console.error("Erro completo:", error);
+      console.error("Código do erro:", error?.code);
+      console.error("Mensagem do erro:", error?.message);
+      console.error("Stack:", error?.stack);
+      
+      setIsLoggingOut(false);
+      Alert.alert("Erro", `Não foi possível fazer logout: ${error?.message || "Erro desconhecido"}`);
     }
   };
 
@@ -115,20 +176,62 @@ export default function Perfil() {
           )}
 
           <TouchableOpacity
-            style={[styles.btn, styles.btnLogout]}
-            onPress={() => {
+            style={[styles.btn, styles.btnLogout, isLoggingOut && styles.btnDisabled]}
+            onPress={async () => {
+              if (isLoggingOut) {
+                console.log("Logout já em andamento, ignorando...");
+                return;
+              }
+              
+              console.log("Botão Sair pressionado");
+              
+              // Usa uma abordagem mais direta - chama o logout sem Alert primeiro para testar
+              // Se funcionar, depois podemos adicionar o Alert de volta
+              try {
+                console.log("Chamando handleLogout diretamente...");
+                await handleLogout();
+              } catch (error) {
+                console.error("Erro ao chamar handleLogout:", error);
+              }
+              
+              // Versão com Alert (comentada temporariamente para debug)
+              /*
               Alert.alert(
                 "Sair",
                 "Deseja realmente sair?",
                 [
-                  { text: "Cancelar", style: "cancel" },
-                  { text: "Sair", onPress: handleLogout, style: "destructive" }
-                ]
+                  { 
+                    text: "Cancelar", 
+                    style: "cancel",
+                    onPress: () => {
+                      console.log("Logout cancelado pelo usuário");
+                    }
+                  },
+                  { 
+                    text: "Sair", 
+                    onPress: async () => {
+                      console.log("Usuário confirmou logout no Alert");
+                      try {
+                        await handleLogout();
+                      } catch (error) {
+                        console.error("Erro ao executar handleLogout do Alert:", error);
+                      }
+                    }, 
+                    style: "destructive" 
+                  }
+                ],
+                { cancelable: true }
               );
+              */
             }}
             activeOpacity={0.8}
+            disabled={isLoggingOut}
           >
-            <Text style={styles.btnText}>Sair</Text>
+            {isLoggingOut ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.btnText}>Sair</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -271,6 +374,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+  },
+  btnDisabled: {
+    opacity: 0.6,
   },
   btnText: {
     color: "#FFFFFF",

@@ -78,6 +78,12 @@ export default function App() {
   useEffect(() => {
     // onAuthStateChanged é o observador mais importante
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log("=== App.tsx - Estado de autenticação mudou ===");
+      console.log("Usuário atual:", currentUser ? currentUser.email : "null");
+      console.log("Mudando user state para:", currentUser ? "autenticado" : "desautenticado");
+      
+      // Sempre atualiza o estado, sem verificação de prevUser
+      // Isso garante que o React detecte a mudança mesmo que seja para null
       setUser(currentUser);
       setLoading(false);
     });
@@ -97,7 +103,7 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer key={user ? 'authenticated' : 'unauthenticated'}>
       {/* Se houver um usuário, mostra o AppStack, senão, o AuthStack */}
       {user ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
