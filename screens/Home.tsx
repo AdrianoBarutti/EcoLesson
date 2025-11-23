@@ -85,13 +85,6 @@ export default function Home() {
           <Text style={styles.headerGreeting}>Olá, {getEmailName()},</Text>
           <Text style={styles.headerSubtitle}>O que você gostaria de aprender hoje?</Text>
         </View>
-        <View style={styles.searchContainer}>
-          <View style={styles.searchIconContainer}>
-            <View style={styles.searchIconCircle} />
-            <View style={styles.searchIconLine} />
-          </View>
-          <Text style={styles.searchPlaceholder}>Buscar aqui</Text>
-        </View>
       </View>
 
       <ScrollView
@@ -193,49 +186,6 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 15,
     color: "rgba(255,255,255,0.9)",
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  searchIconContainer: {
-    width: 20,
-    height: 20,
-    marginRight: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  searchIconCircle: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: "#999",
-    position: "absolute",
-  },
-  searchIconLine: {
-    width: 6,
-    height: 2,
-    backgroundColor: "#999",
-    borderRadius: 1,
-    position: "absolute",
-    right: 0,
-    bottom: 0,
-    transform: [{ rotate: "45deg" }],
-  },
-  searchPlaceholder: {
-    flex: 1,
-    fontSize: 15,
-    color: "#999",
   },
   content: {
     flex: 1,
